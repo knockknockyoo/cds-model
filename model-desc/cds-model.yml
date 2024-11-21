@@ -1,12 +1,12 @@
 Handle: CDS
-Version: v4.4.1
+Version: v4.0.9
 Nodes:
   program:
-    Desc: "Program in sdfsdfsdsdfsdfsdsfdfsdsfdfsfd the Cancer Data Service refer to a broad framework of goals under which related projects or other research activities are grouped. Example - Clinical Proteomic Tumor Analysis Consortium (CPTAC)"
+    Desc: "Program in the Cancer Data Service refer to a broad framework of goals under which related projects or other research activities are grouped. Example - Clinical Proteomic Tumor Analysis Consortium (CPTAC)"
     Tags:
-      Category: study-es=test
+      Category: study
       Assignment: core
-      Class: primarysdfsdfsdfsdfsdfsfd
+      Class: primary
       Template: 'Yes'
     Props:
       - program_name
