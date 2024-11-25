@@ -1,8 +1,8 @@
 Handle: CDS
-Version: v5.1.0
+Version: v5.2.0
 Nodes:
   program:
-    Desc: "test testerterterter final teset program Cancer Data Service refer to a broad framework of goals under which related projects or other research activities are grouped. Example - Clinical Proteomic Tumor Analysis Consortium (CPTAC)"
+    Desc: "test 5.2.0 program Cancer Data Service refer to a broad framework of goals under which related projects or other research activities are grouped. Example - Clinical Proteomic Tumor Analysis Consortium (CPTAC)"
     Tags:
       Category: study
       Assignment: core
