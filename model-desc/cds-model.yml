@@ -1,10 +1,11 @@
 Handle: CDS
-Version: v4.3.2
+Version: v10.0.1
 Nodes:
   program:
     Desc: "Program in the Cancer Data Service refer to a broad framework of goals under which related projects or other research activities are grouped. Example - Clinical Proteomic Tumor Analysis Consortium (CPTAC)"
     Tags:
-      Category: study
+      nodeReq: true
+      Category: administrative
       Assignment: core
       Class: primary
       Template: 'Yes'
@@ -14,7 +15,6 @@ Nodes:
       - program_short_description
       - program_full_description
       - program_external_url
-      - program_sort_order
       - program_short_name
       - institution
       - crdc_id
@@ -22,38 +22,26 @@ Nodes:
   study:
     Desc: "The narrative title used as a textual label for a research data collection. Example – University of Texas PDX Development and Trial Center Grant"
     Tags:
+      nodeReq: true
       Category: study
       Assignment: core
       Class: primary
       Template: 'Yes'
     Props:
+      - study_id
       - study_name
       - study_acronym
       - study_description
       - short_description
       - study_external_url
-      - primary_investigator_name
-      - primary_investigator_email
-      - co_investigator_name
-      - co_investigator_email
       - phs_accession
       - bioproject_accession
-      - index_date # what are relative dates relative to? dx date, collection date, etc.
-      - cds_requestor
       - funding_agency
       - funding_source_program_name
       - grant_id
-      - clinical_trial_system
-      - clinical_trial_identifier
-      - clinical_trial_arm
       - organism_species
       - adult_or_childhood_study # adult, pediatric
-      - data_types # list from enumerated values
-      - file_types # list from enumerated values
       - data_access_level
-      - cds_primary_bucket
-      - cds_secondary_bucket
-      - cds_tertiary_bucket
       - number_of_participants
       - number_of_samples
       - study_data_types
@@ -63,20 +51,16 @@ Nodes:
       - study_access
       - authz
       - study_version
-      - role_or_affiliation
-      - title
-      - first_name
-      - middle_name
-      - last_name
-      - suffix
-      - email
-      - clinical_trial_repository
       - crdc_id
 
   participant:
     Desc: "Individual who takes part in the study"
+    CompKey:
+      - study.study_id
+      - participant_id    
     Tags:
-      Category: study
+      nodeReq: true
+      Category: case
       Assignment: core
       Class: primary
       Template: 'Yes'
@@ -84,17 +68,43 @@ Nodes:
       - study_participant_id
       - participant_id
       - race
-      - gender
+      - sex
       - ethnicity
       #  - vital_status
       - dbGaP_subject_id
-      - sex
       - crdc_id
+  
+  investigator:
+    Desc: "Comprehensive information about the investigators involved in the study, including their roles, affiliations, and contributions."
+    Tags:
+      nodeReq: true
+      Category: case
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Props:
+      - investigator_id
+      - primary_investigator_name
+      - primary_investigator_email
+      - co_investigator_name
+      - co_investigator_email
+      - role_or_affiliation
+      - title
+      - first_name
+      - middle_name
+      - last_name
+      - suffix
+      - email
+
 
   diagnosis: # may have multiple dxs for multiple timepoints?
     Desc: "Text term used to describe the patient's histologic diagnosis, as described by the World Health Organization's (WHO) International Classification of Diseases for Oncology (ICD-O)."
+    CompKey:
+      - participant.study_participant_id
+      - diagnosis_id
     Tags:
-      Category: case
+      nodeReq: true
+      Category: clinical
       Assignment: core
       Class: primary
       Template: 'Yes'
@@ -124,24 +134,27 @@ Nodes:
 
   treatment:
     Desc: "An action or administration of therapeutic agents to produce an effect that is intended to alter the course of a pathologic process."
+    CompKey:
+      - participant.study_participant_id
+      - therapeutic_agents
     Tags:
       Category: case
       Assignment: core
       Class: secondary
-      Template: 'No'
+      Template: 'Yes'
     Props:
       - treatment_id
       - treatment_type
-      - treatment_outcome
       - days_to_treatment
       - therapeutic_agents
       - response
       - crdc_id
 
   sample: # aka subspecimen (CMB)
-    Desc: "An action or administration of therapeutic agents to produce an effect that is intended to alter the course of a pathologic process."
+    Desc: "Specimen tissue type collected from the participant."
     Tags:
-      Category: case
+      nodeReq: true
+      Category: biospecimen
       Assignment: core
       Class: primary
       Template: 'Yes'
@@ -155,11 +168,13 @@ Nodes:
       - sample_age_at_collection
       - derived_from_specimen
       - biosample_accession
+      - tumor_classification
       - crdc_id
 
   file:
     Desc: "A set of related records kept together provided by a submitter."
     Tags:
+      nodeReq: true
       Category: data_file
       Assignment: core
       Class: primary
@@ -178,11 +193,14 @@ Nodes:
       - checksum_algorithm
       - crdc_id
       - file_mapping_level
+      - release_datetime
+      - is_supplementary_file
       #- file_access
 
   genomic_info:
-    Desc: "In CDS genomic info refers to the sequencing methodsm techniques and equipment."
+    Desc: "In GC genomic info refers to the sequencing methods techniques and equipment."
     Tags:
+      nodeReq: true
       Category: data_file
       Assignment: core
       Class: primary
@@ -199,7 +217,6 @@ Nodes:
       - design_description
       - library_strategy
       - library_layout
-      - library_source
       - library_selection
       - platform
       - instrument_model
@@ -212,11 +229,12 @@ Nodes:
 
   image:
     Tags:
+      nodeReq: true
       Category: data_file
       Assignment: core
       Class: primary
       Template: 'Yes'
-    Desc: "The imaging data from DICOM and non-DICOM standards into CDS."
+    Desc: "The imaging data from DICOM and non-DICOM standards into GC."
     Props:
       - study_link_id
       - de_identification_method_type
@@ -228,58 +246,23 @@ Nodes:
       - image_modality
       - imaging_equipment_manufacturer
       - imaging_equipment_model
-      - imaging_sofware
+      - imaging_software
       - imaging_protocol
       - organ_or_tissue
-      - performed_imaging_study_description
-      - performed_imaging_study_admittingDiagnosisCode
-      - performed_imaging_study_nonAcquisitionModalitiesInStudyCode
-      - performed_imaging_study_lossyImageCompressionIndicator
-      - performed_imaging_study_summary
-      - performed_imaging_study_primaryAnatomicSiteCode
-      - performed_imaging_study_acquisitionTypeCode
-      - performed_imaging_study_cardiacSynchronizationTechniqueCode
-      - performed_imaging_study_dataCollectionDiameter
-      - performed_imaging_study_respiratoryMotionTechniqueCode
-      - performed_imaging_study_bodyPositionCode
-      - performed_imaging_study_typeCode
-      - performed_imaging_study_algorithmCode
-      - performed_imaging_study_reconstructionFieldOfViewHeight
-      - performed_imaging_study_reconstructionFieldOfViewWidth
-      - performed_imaging_study_reconstructionDiameter
-      - performed_imaging_study_sliceThickness
-      - performed_imaging_study_reconstructionInterval
       - longitudinal_temporal_event_type
       - longitudinal_temporal_event_offset
-      - CTAquisitionProtocolElement_singleCollimationWidth
-      - CTAquisitionProtocolElement_totalCollimationWidth
-      - CTAquisitionProtocolElement_gantryDetectorTilt
-      - CTAquisitionProtocolElement_spiralPitchFactor
-      - CTAquisitionProtocolElement_ctdiVol
-      - CTAquisitionProtocolElement_ctdiPhantomTypeCode
-      - CTAquisitionProtocolElement_kVp
-      - CTAquisitionProtocolElement_exposureModulationType_Code
-      - CTImageReconstructionProtocolElement_convolutionKernel
-      - CTImageReconstructionProtocolElement_convolutionKernelGroupCode
-      - MRImageAcquisitionProtocolElement_echoPulseSequenceCategoryCode
-      - MRImageAcquisitionProtocolElement_diffusionBValue
-      - MRImageAcquisitionProtocolElement_diffusionDirectionalityCode
-      - MRImageAcquisitionProtocolElement_magneticFieldStrength
-      - MRImageAcquisitionProtocolElement_resonantNucleusCode
-      - MRImageAcquisitionProtocolElement_acquisitionContrastCode
-      - MRImageAcquisitionProtocolElement_inversionRecoveryIndicator
-      - MRImageAcquisitionProtocolElement_pulseSequenceName
-      - MRImageAcquisitionProtocolElement_multipleSpinEchoIndicator
-      - MRImageAcquisitionProtocolElement_phaseContrastIndicator
-      - MRImageAcquisitionProtocolElement_timeOfFlightContrastIndicator
-      - MRImageAcquisitionProtocolElement_arterialSpinLabelingContrastCode
-      - MRImageAcquisitionProtocolElement_steadyStatePulseSequenceCode
-      - MRImageAcquisitionProtocolElement_echoPlanarPulseSequenceIndicator
-      - MRImageAcquisitionProtocolElement_saturationRecoveryIndicator
-      - MRImageAcquisitionProtocolElement_spectrallySelectedSuppressionCode
-      - MRImageReconstructionProtocolElement_complexImageComponentCode
-      - PETImagingAcquisitionProtocolElement_gantryDetectorTilt
-      - Radiopharmaceutical_radionuclideCode
+      - crdc_id
+
+  MultiplexMicroscopy:
+    Tags:
+      nodeReq: true
+      Category: data_file
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Desc: "non DICOM standard multiplex images to analyze cellular interactions and spatial context in biological samples"
+    Props:
+      - MultiplexMicroscopy_id
       - acquisition_method_type
       - tumor_tissue_type
       - tissue_fixative
@@ -325,6 +308,186 @@ Nodes:
       - concentration
       - crdc_id
 
+  NonDICOMCTimages:
+    Tags:
+      nodeReq: true
+      Category: data_file
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Desc: "non DICOM standard computed tomography images"
+    Props:
+      - NonDICOMCTimages_id
+      - CTAquisitionProtocolElement_singleCollimationWidth
+      - CTAquisitionProtocolElement_totalCollimationWidth
+      - CTAquisitionProtocolElement_gantryDetectorTilt
+      - CTAquisitionProtocolElement_spiralPitchFactor
+      - CTAquisitionProtocolElement_ctdiVol
+      - CTAquisitionProtocolElement_ctdiPhantomTypeCode
+      - CTAquisitionProtocolElement_kVp
+      - CTAquisitionProtocolElement_exposureModulationType_Code
+      - CTImageReconstructionProtocolElement_convolutionKernel
+      - CTImageReconstructionProtocolElement_convolutionKernelGroupCode
+      - crdc_id
+
+  NonDICOMMRimages:
+    Tags:
+      nodeReq: true
+      Category: data_file
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Desc: "non DICOM standard magnetic resonance images"
+    Props:
+      - NonDICOMMRimages_id
+      - MRImageAcquisitionProtocolElement_echoPulseSequenceCategoryCode
+      - MRImageAcquisitionProtocolElement_diffusionBValue
+      - MRImageAcquisitionProtocolElement_diffusionDirectionalityCode
+      - MRImageAcquisitionProtocolElement_magneticFieldStrength
+      - MRImageAcquisitionProtocolElement_resonantNucleusCode
+      - MRImageAcquisitionProtocolElement_acquisitionContrastCode
+      - MRImageAcquisitionProtocolElement_inversionRecoveryIndicator
+      - MRImageAcquisitionProtocolElement_pulseSequenceName
+      - MRImageAcquisitionProtocolElement_multipleSpinEchoIndicator
+      - MRImageAcquisitionProtocolElement_phaseContrastIndicator
+      - MRImageAcquisitionProtocolElement_timeOfFlightContrastIndicator
+      - MRImageAcquisitionProtocolElement_arterialSpinLabelingContrastCode
+      - MRImageAcquisitionProtocolElement_steadyStatePulseSequenceCode
+      - MRImageAcquisitionProtocolElement_echoPlanarPulseSequenceIndicator
+      - MRImageAcquisitionProtocolElement_saturationRecoveryIndicator
+      - MRImageAcquisitionProtocolElement_spectrallySelectedSuppressionCode
+      - MRImageReconstructionProtocolElement_complexImageComponentCode
+      - crdc_id
+
+  NonDICOMpathologyImages:
+    Tags:
+        nodeReq: true
+        Category: data_file
+        Assignment: core
+        Class: primary
+        Template: 'Yes'
+    Desc: "non DICOM standard used for the study of  examination of tissue samples and histological features"
+    Props:
+      - NonDICOMpathologyImages_id
+      - acquisition_method_type
+      - tumor_tissue_type
+      - tissue_fixative
+      - embedding_medium
+      - staining_method
+      - objective
+      - nominal_magnification
+      - immersion
+      - lens_numerical_aperture
+      - crdc_id
+
+  NonDICOMPETimages:
+    Tags:
+      nodeReq: true
+      Category: data_file
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Desc: "non DICOM standard positron emission tomography used to study metabolic processes in tissues"
+    Props:
+      - NonDICOMPETimages_id
+      - PETImagingAcquisitionProtocolElement_gantryDetectorTilt
+      - Radiopharmaceutical_radionuclideCode
+      - crdc_id
+
+  NonDICOMradiologyAllModalities:
+    Tags:
+      nodeReq: true
+      Category: data_file
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Desc: "non DICOM standard radiology images"
+    Props:
+      - NonDICOMradiologyAllModalities_id
+      - performed_imaging_study_description
+      - performed_imaging_study_admittingDiagnosisCode
+      - performed_imaging_study_nonAcquisitionModalitiesInStudyCode
+      - performed_imaging_study_lossyImageCompressionIndicator
+      - performed_imaging_study_summary
+      - performed_imaging_study_primaryAnatomicSiteCode
+      - performed_imaging_study_acquisitionTypeCode
+      - performed_imaging_study_cardiacSynchronizationTechniqueCode
+      - performed_imaging_study_dataCollectionDiameter
+      - performed_imaging_study_respiratoryMotionTechniqueCode
+      - performed_imaging_study_bodyPositionCode
+      - performed_imaging_study_algorithmCode
+      - performed_imaging_study_reconstructionFieldOfViewHeight
+      - performed_imaging_study_reconstructionFieldOfViewWidth
+      - performed_imaging_study_reconstructionDiameter
+      - performed_imaging_study_sliceThickness
+      - performed_imaging_study_reconstructionInterval
+      - performed_imaging_study_typeCode
+      - crdc_id
+
+  proteomic:
+    Tags:
+      nodeReq: true
+      Category: data_file
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Desc: "proteo-genomic data submitted to GC"
+    Props:
+      - proteomic_info_id
+      - aliquot_id
+      - analytical_fractions
+      - instrument_make
+      - proteomic_instrument_model
+      - proteomic_design_description
+      - manufacturer_model_name
+      - crdc_id
+  
+  pdx:
+    Desc: "The PDX node represents a unique patient-derived xenograft model. Including a Unique identifier for the PDX model, Human-readable name, mouse strain used."
+    Tags:
+      nodeReq: true
+      Category: biospecimen
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Props:
+    - pdx_id
+    - model_id
+    - implantation_type
+    - implantation_site
+    - mouse_strain
+    - sample_type_for_implantation
+    - tumor_not_mus_or_ebv_origin
+
+  version:
+    Tags:
+      Category: data_file
+      Assignment: core
+      Class: primary
+      Template: 'No'
+    Desc: "version of the data being uploaded for release"
+    Props:
+      - data_version_id
+      - data_version
+      - datetime
+      - model_version
+      - description
+      - crdc_id
+
+  consent_group:
+    Desc: "A set of study participants who have signed the same consent agreement and that will be included in the dbGaP repository."
+    Tags:
+      nodeReq: true
+      Category: case
+      Assignment: extended
+      Class: secondary
+      Template: 'Yes'
+    Props:
+      - consent_group_id
+      - consent_group_name
+      - consent_group_number
+      - crdc_id
+
 Relationships:
   of_program:
     Props: null
@@ -340,6 +503,18 @@ Relationships:
         Dst: study
       - Src: file
         Dst: study
+      - Src: pdx
+        Dst: study
+      - Src: consent_group
+        Dst: study
+      - Src: investigator
+        Dst: study
+  of_consent_group:
+    Props: null
+    Mul: many_to_one
+    Ends:
+      - Src: participant
+        Dst: consent_group
   of_participant:
     Props: null
     Mul: many_to_one
@@ -353,12 +528,24 @@ Relationships:
         Mul: many_to_many
       - Src: treatment
         Dst: participant
+  of_pdx:
+    Props: null
+    Mul: many_to_one
+    Ends:
+      - Src: sample
+        Dst: pdx
   from_sample:
     Props: null
     Mul: many_to_many
     Ends:
       - Src: file
         Dst: sample
+      - Src: pdx
+        Dst: sample
+        Mul: many_to_one
+      - Src: diagnosis
+        Dst: sample
+        Mul: many_to_one
   of_file:
     Props: null
     Mul: many_to_one
@@ -368,6 +555,24 @@ Relationships:
       - Src: image
         Dst: file
         Mul: one_to_one
+      - Src: proteomic
+        Dst: file
+  of_image:
+    Props: null
+    Mul: one_to_one
+    Ends:
+      - Src: MultiplexMicroscopy
+        Dst: image
+      - Src: NonDICOMCTimages
+        Dst: image
+      - Src: NonDICOMpathologyImages
+        Dst: image
+      - Src: NonDICOMMRimages
+        Dst: image
+      - Src: NonDICOMradiologyAllModalities
+        Dst: image
+      - Src: NonDICOMPETimages
+        Dst: image
   associated_with:
     Props: null
     Mul: many_to_one
