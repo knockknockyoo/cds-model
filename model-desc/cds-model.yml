@@ -1,5 +1,5 @@
 Handle: CDS
-Version: v10.0.1
+Version: v11.0.0
 Nodes:
   program:
     Desc: "Program in the Cancer Data Service refer to a broad framework of goals under which related projects or other research activities are grouped. Example - Clinical Proteomic Tumor Analysis Consortium (CPTAC)"
@@ -57,7 +57,7 @@ Nodes:
     Desc: "Individual who takes part in the study"
     CompKey:
       - study.study_id
-      - participant_id    
+      - participant_id
     Tags:
       nodeReq: true
       Category: case
@@ -73,7 +73,7 @@ Nodes:
       #  - vital_status
       - dbGaP_subject_id
       - crdc_id
-  
+
   investigator:
     Desc: "Comprehensive information about the investigators involved in the study, including their roles, affiliations, and contributions."
     Tags:
@@ -169,7 +169,68 @@ Nodes:
       - derived_from_specimen
       - biosample_accession
       - tumor_classification
+      - Organization_Name
       - crdc_id
+
+  Characterization:
+    Desc: TBD
+    Tags:
+      nodeReq: true
+      Category: biospecimen
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Props:
+      - Characterization_ID
+      - Characterization_Assay_Type
+      - Characterization_Name
+      - crdc_id
+
+  Publication:
+    Desc: TBD
+    Tags:
+      nodeReq: true
+      Category: biospecimen
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Props:
+      - DOI_or_Pub_ID
+      - Publication_Type
+      - Publication_Status
+      - Publication_Title
+      - crdc_id
+
+  Protocol:
+    Desc: TBD
+    Tags:
+      nodeReq: true
+      Category: biospecimen
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Props:
+      - protocol_pk_id
+      - protocol_name
+      - protocol_type
+      - doi
+      - crdc_id
+
+  Composition:
+    Desc: TBD
+    Tags:
+      nodeReq: true
+      Category: biospecimen
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
+    Props:
+      - Composition_ID
+      - Nanomaterial_Entity_Type
+      - Functionalizing_Entity_Type
+      - Functionalizing_Entity_Inherent_Function_Type
+      - crdc_id
+
 
   file:
     Desc: "A set of related records kept together provided by a submitter."
@@ -361,11 +422,11 @@ Nodes:
 
   NonDICOMpathologyImages:
     Tags:
-        nodeReq: true
-        Category: data_file
-        Assignment: core
-        Class: primary
-        Template: 'Yes'
+      nodeReq: true
+      Category: data_file
+      Assignment: core
+      Class: primary
+      Template: 'Yes'
     Desc: "non DICOM standard used for the study of  examination of tissue samples and histological features"
     Props:
       - NonDICOMpathologyImages_id
@@ -441,7 +502,7 @@ Nodes:
       - proteomic_design_description
       - manufacturer_model_name
       - crdc_id
-  
+
   pdx:
     Desc: "The PDX node represents a unique patient-derived xenograft model. Including a Unique identifier for the PDX model, Human-readable name, mouse strain used."
     Tags:
@@ -451,13 +512,13 @@ Nodes:
       Class: primary
       Template: 'Yes'
     Props:
-    - pdx_id
-    - model_id
-    - implantation_type
-    - implantation_site
-    - mouse_strain
-    - sample_type_for_implantation
-    - tumor_not_mus_or_ebv_origin
+      - pdx_id
+      - model_id
+      - implantation_type
+      - implantation_site
+      - mouse_strain
+      - sample_type_for_implantation
+      - tumor_not_mus_or_ebv_origin
 
   version:
     Tags:
@@ -546,6 +607,22 @@ Relationships:
       - Src: diagnosis
         Dst: sample
         Mul: many_to_one
+      - Src: Characterization
+        Dst: sample
+        Mul: many_to_one
+      - Src: Composition
+        Dst: sample
+        Mul: many_to_one
+      - Src: Publication
+        Dst: sample
+      - Src: Protocol
+        Dst: sample
+  of_protocol:
+    Props: null
+    Mul: many_to_many
+    Ends:
+      - Src: Publication
+        Dst: Protocol
   of_file:
     Props: null
     Mul: many_to_one
@@ -577,5 +654,5 @@ Relationships:
     Props: null
     Mul: many_to_one
     Ends:
-      - Src: file 
+      - Src: file
         Dst: file
